@@ -77,9 +77,11 @@ export default {
     };
   },
   mounted() {
-    // Conectar al servidor - usar localhost desde el navegador
+    // Conectar al servidor - detectar automáticamente la URL
+    // En desarrollo local: localhost, en producción: usar el mismo hostname
+    const hostname = window.location.hostname;
     const socketUrl =
-      import.meta.env.VITE_SOCKET_URL || "http://localhost:3000";
+      import.meta.env.VITE_SOCKET_URL || `http://${hostname}:3000`;
 
     this.socket = io(socketUrl, {
       reconnection: true,
