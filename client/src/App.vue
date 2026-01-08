@@ -16,9 +16,7 @@
         placeholder="Ingresa tu nombre"
         class="input-nombre"
       />
-      <button @click="unirseAlChat" class="btn-unirse">
-        Unirse al Chat
-      </button>
+      <button @click="unirseAlChat" class="btn-unirse">Unirse al Chat</button>
     </div>
 
     <!-- Área de chat -->
@@ -32,11 +30,13 @@
         >
           <div class="mensaje-header">
             <strong>{{ mensaje.nombre }}</strong>
-            <span class="timestamp">{{ formatearFecha(mensaje.timestamp) }}</span>
+            <span class="timestamp">{{
+              formatearFecha(mensaje.timestamp)
+            }}</span>
           </div>
           <div class="mensaje-texto">{{ mensaje.mensaje }}</div>
         </div>
-        
+
         <!-- Indicador de usuario escribiendo -->
         <div v-if="usuarioEscribiendo" class="escribiendo">
           {{ usuarioEscribiendo }} está escribiendo...
@@ -53,116 +53,113 @@
           placeholder="Escribe un mensaje..."
           class="input-mensaje"
         />
-        <button @click="enviarMensaje" class="btn-enviar">
-          Enviar
-        </button>
+        <button @click="enviarMensaje" class="btn-enviar">Enviar</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { io } from 'socket.io-client';
+import { io } from "socket.io-client";
 
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
       socket: null,
-      nombreUsuario: '',
-      nombreInput: '',
-      nuevoMensaje: '',
+      nombreUsuario: "",
+      nombreInput: "",
+      nuevoMensaje: "",
       mensajes: [],
       socketId: null,
-      usuarioEscribiendo: '',
-      timeoutEscribiendo: null
+      usuarioEscribiendo: "",
+      timeoutEscribiendo: null,
     };
   },
   mounted() {
     // Conectar al servidor - usar localhost desde el navegador
-    const socketUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      ? 'http://localhost:3000'
-      : 'http://server:3000';
-    
+    const socketUrl =
+      import.meta.env.VITE_SOCKET_URL || "http://localhost:3000";
+
     this.socket = io(socketUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
-      reconnectionAttempts: Infinity
+      reconnectionAttempts: Infinity,
     });
 
     // Eventos del socket
-    this.socket.on('connect', () => {
-      console.log('✅ Conectado al servidor');
+    this.socket.on("connect", () => {
+      console.log("✅ Conectado al servidor");
       this.socketId = this.socket.id;
     });
 
-    this.socket.on('mensaje:recibir', (data) => {
+    this.socket.on("mensaje:recibir", (data) => {
       this.mensajes.push(data);
       this.scrollToBottom();
     });
 
-    this.socket.on('usuario:conectado', (data) => {
+    this.socket.on("usuario:conectado", (data) => {
       this.mensajes.push({
-        id: 'sistema',
-        nombre: 'Sistema',
+        id: "sistema",
+        nombre: "Sistema",
         mensaje: data.mensaje,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       this.scrollToBottom();
     });
 
-    this.socket.on('usuario:desconectado', (data) => {
+    this.socket.on("usuario:desconectado", (data) => {
       this.mensajes.push({
-        id: 'sistema',
-        nombre: 'Sistema',
+        id: "sistema",
+        nombre: "Sistema",
         mensaje: data.mensaje,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       this.scrollToBottom();
     });
 
-    this.socket.on('usuario:escribiendo', (nombre) => {
+    this.socket.on("usuario:escribiendo", (nombre) => {
       this.usuarioEscribiendo = nombre;
       clearTimeout(this.timeoutEscribiendo);
       this.timeoutEscribiendo = setTimeout(() => {
-        this.usuarioEscribiendo = '';
+        this.usuarioEscribiendo = "";
       }, 3000);
     });
 
-    this.socket.on('usuario:dejo_escribir', () => {
-      this.usuarioEscribiendo = '';
+    this.socket.on("usuario:dejo_escribir", () => {
+      this.usuarioEscribiendo = "";
     });
 
-    this.socket.on('disconnect', () => {
-      console.log('❌ Desconectado del servidor');
+    this.socket.on("disconnect", () => {
+      console.log("❌ Desconectado del servidor");
     });
   },
   methods: {
     unirseAlChat() {
       if (this.nombreInput.trim()) {
         this.nombreUsuario = this.nombreInput.trim();
-        this.socket.emit('usuario:unirse', this.nombreUsuario);
+        this.socket.emit("usuario:unirse", this.nombreUsuario);
       }
     },
     enviarMensaje() {
       if (this.nuevoMensaje.trim() && this.nombreUsuario) {
-        this.socket.emit('mensaje:enviar', {
-          mensaje: this.nuevoMensaje.trim()
+        this.socket.emit("mensaje:enviar", {
+          mensaje: this.nuevoMensaje.trim(),
         });
-        this.nuevoMensaje = '';
-        this.socket.emit('usuario:dejo_escribir');
+        this.nuevoMensaje = "";
+        this.socket.emit("usuario:dejo_escribir");
       }
     },
     usuarioEstaEscribiendo() {
       if (this.nombreUsuario) {
-        this.socket.emit('usuario:escribiendo', this.nombreUsuario);
+        this.socket.emit("usuario:escribiendo", this.nombreUsuario);
       }
     },
     formatearFecha(timestamp) {
       const fecha = new Date(timestamp);
-      return fecha.toLocaleTimeString('es-ES', {
-        hour: '2-digit',
-        minute: '2-digit'
+      return fecha.toLocaleTimeString("es-ES", {
+        hour: "2-digit",
+        minute: "2-digit",
       });
     },
     scrollToBottom() {
@@ -172,13 +169,13 @@ export default {
           container.scrollTop = container.scrollHeight;
         }
       });
-    }
+    },
   },
   beforeUnmount() {
     if (this.socket) {
       this.socket.disconnect();
     }
-  }
+  },
 };
 </script>
 
@@ -190,7 +187,7 @@ export default {
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   display: flex;
@@ -365,4 +362,3 @@ body {
   border-radius: 4px;
 }
 </style>
-
