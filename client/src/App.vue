@@ -47,15 +47,18 @@
       <!-- Área de chat -->
       <div
         v-else
-        class="flex-1 flex flex-col overflow-hidden min-h-0 relative pb-20 md:pb-0"
+        class="flex-1 flex flex-col min-h-0 relative"
+        style="display: flex; flex-direction: column"
       >
         <!-- Contenedor de mensajes -->
         <div
           ref="mensajesContainer"
-          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50 pb-4"
+          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50"
           style="
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
+            flex: 1 1 auto;
+            min-height: 0;
           "
         >
           <!-- Mensajes -->
@@ -119,11 +122,11 @@
           </div>
         </div>
 
-        <!-- Input de mensaje - SIEMPRE VISIBLE Y FIJO EN MÓVILES -->
+        <!-- Input de mensaje - SIEMPRE VISIBLE AL FINAL -->
         <div
-          class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 flex-shrink-0 w-full fixed bottom-0 left-0 right-0 md:relative md:bottom-auto md:left-auto md:right-auto"
+          class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 w-full"
           style="
-            z-index: 9999;
+            flex-shrink: 0;
             padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
           "
         >
