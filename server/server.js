@@ -8,12 +8,18 @@ app.use(cors());
 
 const server = http.createServer(app);
 
-// Configurar Socket.IO con CORS
+// Configurar Socket.IO con CORS y opciones para móviles
 const io = new Server(server, {
   cors: {
     origin: "*",
-    methods: ["GET", "POST"]
-  }
+    methods: ["GET", "POST"],
+    credentials: true
+  },
+  // Opciones para mejor compatibilidad con móviles
+  transports: ['polling', 'websocket'],
+  allowEIO3: true,
+  pingTimeout: 60000,
+  pingInterval: 25000
 });
 
 // Almacenar usuarios conectados

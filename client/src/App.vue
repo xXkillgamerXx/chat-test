@@ -78,24 +78,44 @@ export default {
   },
   mounted() {
     // Conectar al servidor - detectar automáticamente la URL
-    // Si es IP privada de Docker o localhost, usar localhost
-    // Si es IP pública, usar esa IP
+    // Usar siempre el mismo hostname desde donde se accede
     const hostname = window.location.hostname;
-    const isPrivateIP = 
-      hostname === 'localhost' || 
-      hostname === '127.0.0.1' ||
-      hostname.startsWith('172.') ||
-      hostname.startsWith('10.') ||
-      hostname.startsWith('192.168.');
+    const protocol = window.location.protocol;
+    const port = window.location.port;
     
-    const serverHost = isPrivateIP ? 'localhost' : hostname;
-    const socketUrl =
-      import.meta.env.VITE_SOCKET_URL || `http://${serverHost}:3000`;
-
+    // Determinar la URL del servidor
+    let socketUrl = import.meta.env.VITE_SOCKET_URL;
+    
+    if (!socketUrl) {
+      // Si estamos en localhost o IP privada, usar localhost para el servidor
+      const isLocal = 
+        hostname === 'localhost' || 
+        hostname === '127.0.0.1' ||
+        hostname.startsWith('172.') ||
+        hostname.startsWith('10.') ||
+        hostname.startsWith('192.168.');
+      
+      if (isLocal) {
+        socketUrl = 'http://localhost:3000';
+      } else {
+        // En producción/AWS, usar el mismo hostname pero puerto 3000
+        socketUrl = `${protocol}//${hostname}:3000`;
+      }
+    }
+    
+    console.log('🔌 Conectando a:', socketUrl);
+    
     this.socket = io(socketUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: Infinity,
+      // Opciones para móviles - intentar polling primero, luego upgrade a websocket
+      transports: ['polling', 'websocket'],
+      upgrade: true,
+      rememberUpgrade: false,
+      // Timeouts más largos para conexiones móviles
+      timeout: 20000,
+      forceNew: false,
     });
 
     // Eventos del socket
