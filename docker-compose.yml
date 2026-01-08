@@ -1,0 +1,30 @@
+﻿version: '3.8'
+
+services:
+  server:
+    build: ./server
+    container_name: chat-server
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - chat-network
+    restart: unless-stopped
+
+  client:
+    build: ./client
+    container_name: chat-client
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server
+    environment:
+      - VITE_SOCKET_URL=http://server:3000
+    networks:
+      - chat-network
+    restart: unless-stopped
+
+networks:
+  chat-network:
+    driver: bridge
