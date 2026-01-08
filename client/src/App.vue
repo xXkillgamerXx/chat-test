@@ -78,19 +78,36 @@ export default {
   },
   mounted() {
     // Conectar al servidor - detectar automáticamente la URL
-    // Si es IP privada de Docker o localhost, usar localhost
-    // Si es IP pública, usar esa IP
+    // Si hay variable de entorno, usarla; si no, usar el mismo hostname y protocolo
+    const protocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
     const hostname = window.location.hostname;
-    const isPrivateIP = 
-      hostname === 'localhost' || 
-      hostname === '127.0.0.1' ||
-      hostname.startsWith('172.') ||
-      hostname.startsWith('10.') ||
-      hostname.startsWith('192.168.');
     
-    const serverHost = isPrivateIP ? 'localhost' : hostname;
-    const socketUrl =
-      import.meta.env.VITE_SOCKET_URL || `http://${serverHost}:3000`;
+    // Si hay nginx, usar el mismo hostname (nginx maneja el routing)
+    // Si no, usar la lógica anterior
+    let socketUrl = import.meta.env.VITE_SOCKET_URL;
+    
+    if (!socketUrl) {
+      // Si estamos en HTTPS o usando nginx (puerto 80/443), usar el mismo hostname
+      const isNginx = window.location.port === '' || 
+                      window.location.port === '80' || 
+                      window.location.port === '443';
+      
+      if (isNginx || protocol === 'https:') {
+        // Nginx maneja el routing, usar el mismo hostname
+        socketUrl = `${protocol}//${hostname}/socket.io/`;
+      } else {
+        // Sin nginx, conectar directamente al servidor
+        const isPrivateIP = 
+          hostname === 'localhost' || 
+          hostname === '127.0.0.1' ||
+          hostname.startsWith('172.') ||
+          hostname.startsWith('10.') ||
+          hostname.startsWith('192.168.');
+        
+        const serverHost = isPrivateIP ? 'localhost' : hostname;
+        socketUrl = `http://${serverHost}:3000`;
+      }
+    }
 
     this.socket = io(socketUrl, {
       reconnection: true,
