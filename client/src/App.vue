@@ -49,7 +49,7 @@
         <!-- Contenedor de mensajes -->
         <div
           ref="mensajesContainer"
-          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50 pb-20 md:pb-4"
+          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50 pb-24 md:pb-4"
           style="
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
@@ -118,7 +118,7 @@
 
         <!-- Input de mensaje - SIEMPRE VISIBLE Y FIJO EN MÓVILES -->
         <div
-          class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 flex-shrink-0 relative z-50 w-full"
+          class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 flex-shrink-0 w-full fixed bottom-0 left-0 right-0 md:relative md:bottom-auto md:left-auto md:right-auto z-50"
           style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));"
         >
           <div class="flex gap-2 items-center">
@@ -128,7 +128,7 @@
               @input="usuarioEstaEscribiendo"
               type="text"
               placeholder="Escribe un mensaje..."
-              class="flex-1 px-4 py-3 text-base md:text-base border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all min-h-[44px]"
+              class="flex-1 px-4 py-3 text-base md:text-base border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all min-h-[44px] bg-white"
               style="font-size: 16px;"
             />
             <button
