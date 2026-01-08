@@ -2,38 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Safe area para iOS */
-@supports (padding: max(0px)) {
-  .safe-top {
-    padding-top: max(1rem, env(safe-area-inset-top));
+@layer base {
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
   }
-  .safe-bottom {
-    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+
+  #app {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height para móviles */
   }
-}
 
-/* Scrollbar personalizado */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-}
+  /* Prevenir zoom en iOS al tocar inputs */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #667eea;
-  border-radius: 10px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #5a67d8;
-}
-
-/* Smooth scroll */
-.smooth-scroll {
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
+  @media (min-width: 768px) {
+    input,
+    textarea,
+    select {
+      font-size: inherit;
+    }
+  }
 }
 

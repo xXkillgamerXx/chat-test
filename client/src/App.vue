@@ -1,15 +1,16 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center p-0 md:p-4">
+  <!-- Wrapper principal con fondo gradiente -->
+  <div class="min-h-screen h-screen md:h-auto bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center p-0 md:p-4">
     <!-- Contenedor principal del chat -->
-    <div class="w-full h-screen md:h-[90vh] md:max-w-2xl md:rounded-2xl bg-white shadow-2xl flex flex-col overflow-hidden">
+    <div class="w-full h-full md:h-[90vh] md:max-w-2xl md:rounded-2xl bg-white shadow-2xl flex flex-col overflow-hidden">
       
       <!-- Header -->
-      <div class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3 md:py-4 safe-top">
+      <header class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3 md:py-4 flex-shrink-0">
         <h1 class="text-lg md:text-2xl font-bold text-center mb-1">💬 Chat Simple</h1>
         <div v-if="nombreUsuario" class="text-xs md:text-sm text-center opacity-90">
           Conectado como: <span class="font-semibold">{{ nombreUsuario }}</span>
         </div>
-      </div>
+      </header>
 
       <!-- Formulario de login -->
       <div v-if="!nombreUsuario" class="flex-1 flex items-center justify-center px-4 py-8">
@@ -31,11 +32,12 @@
       </div>
 
       <!-- Área de chat -->
-      <div v-else class="flex-1 flex flex-col overflow-hidden">
+      <div v-else class="flex-1 flex flex-col overflow-hidden min-h-0">
         <!-- Contenedor de mensajes -->
         <div
           ref="mensajesContainer"
-          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50 custom-scrollbar smooth-scroll"
+          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50"
+          style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;"
         >
           <!-- Mensajes -->
           <div
@@ -99,8 +101,8 @@
           </div>
         </div>
 
-        <!-- Input de mensaje -->
-        <div class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 safe-bottom">
+        <!-- Input de mensaje - SIEMPRE VISIBLE -->
+        <div class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 flex-shrink-0">
           <div class="flex gap-2 items-end">
             <input
               v-model="nuevoMensaje"
@@ -113,7 +115,7 @@
             <button
               @click="enviarMensaje"
               :disabled="!nuevoMensaje.trim()"
-              class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-full min-w-[70px] md:min-w-[80px] hover:from-purple-700 hover:to-pink-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm md:text-base"
+              class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-full min-w-[70px] md:min-w-[80px] hover:from-purple-700 hover:to-pink-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm md:text-base flex-shrink-0"
             >
               Enviar
             </button>
@@ -145,55 +147,56 @@ export default {
     // Conectar al servidor - detectar automáticamente la URL
     const hostname = window.location.hostname;
     const protocol = window.location.protocol;
-    
+
     // Determinar la URL del servidor
     let socketUrl = import.meta.env.VITE_SOCKET_URL;
-    
+
     // Si VITE_SOCKET_URL está definida pero es localhost, ignorarla en producción
-    if (socketUrl && socketUrl.includes('localhost')) {
-      const isLocal = 
-        hostname === 'localhost' || 
-        hostname === '127.0.0.1' ||
-        hostname.startsWith('172.') ||
-        hostname.startsWith('10.') ||
-        hostname.startsWith('192.168.');
-      
+    if (socketUrl && socketUrl.includes("localhost")) {
+      const isLocal =
+        hostname === "localhost" ||
+        hostname === "127.0.0.1" ||
+        hostname.startsWith("172.") ||
+        hostname.startsWith("10.") ||
+        hostname.startsWith("192.168.");
+
       // Solo usar localhost si realmente estamos en localhost
       if (!isLocal) {
         socketUrl = null; // Forzar detección automática
       }
     }
-    
+
     if (!socketUrl) {
       // Si estamos en localhost o IP privada, usar localhost para el servidor
-      const isLocal = 
-        hostname === 'localhost' || 
-        hostname === '127.0.0.1' ||
-        hostname.startsWith('172.') ||
-        hostname.startsWith('10.') ||
-        hostname.startsWith('192.168.');
-      
+      const isLocal =
+        hostname === "localhost" ||
+        hostname === "127.0.0.1" ||
+        hostname.startsWith("172.") ||
+        hostname.startsWith("10.") ||
+        hostname.startsWith("192.168.");
+
       if (isLocal) {
-        socketUrl = 'http://localhost:3000';
+        socketUrl = "http://localhost:3000";
       } else {
         // En producción/AWS, usar el mismo protocolo y hostname
-        const useHttps = protocol === 'https:' || 
-                        window.location.port === '443' ||
-                        (!window.location.port && protocol === 'https:');
-        
-        const socketProtocol = useHttps ? 'https:' : 'http:';
+        const useHttps =
+          protocol === "https:" ||
+          window.location.port === "443" ||
+          (!window.location.port && protocol === "https:");
+
+        const socketProtocol = useHttps ? "https:" : "http:";
         socketUrl = `${socketProtocol}//${hostname}:3000`;
       }
     }
-    
-    console.log('🔌 Conectando a:', socketUrl);
-    
+
+    console.log("🔌 Conectando a:", socketUrl);
+
     this.socket = io(socketUrl, {
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionAttempts: Infinity,
       // Opciones para móviles - intentar polling primero, luego upgrade a websocket
-      transports: ['polling', 'websocket'],
+      transports: ["polling", "websocket"],
       upgrade: true,
       rememberUpgrade: false,
       // Timeouts más largos para conexiones móviles
@@ -292,29 +295,3 @@ export default {
   },
 };
 </script>
-
-<style>
-/* Estilos adicionales si es necesario */
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow: hidden;
-}
-
-#app {
-  height: 100vh;
-  height: 100dvh; /* Dynamic viewport height para móviles */
-}
-
-/* Prevenir zoom en iOS al tocar inputs */
-input, textarea, select {
-  font-size: 16px !important;
-}
-
-@media (min-width: 768px) {
-  input, textarea, select {
-    font-size: inherit;
-  }
-}
-</style>
