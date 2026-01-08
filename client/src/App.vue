@@ -78,10 +78,19 @@ export default {
   },
   mounted() {
     // Conectar al servidor - detectar automáticamente la URL
-    // En desarrollo local: localhost, en producción: usar el mismo hostname
+    // Si es IP privada de Docker o localhost, usar localhost
+    // Si es IP pública, usar esa IP
     const hostname = window.location.hostname;
+    const isPrivateIP = 
+      hostname === 'localhost' || 
+      hostname === '127.0.0.1' ||
+      hostname.startsWith('172.') ||
+      hostname.startsWith('10.') ||
+      hostname.startsWith('192.168.');
+    
+    const serverHost = isPrivateIP ? 'localhost' : hostname;
     const socketUrl =
-      import.meta.env.VITE_SOCKET_URL || `http://${hostname}:3000`;
+      import.meta.env.VITE_SOCKET_URL || `http://${serverHost}:3000`;
 
     this.socket = io(socketUrl, {
       reconnection: true,

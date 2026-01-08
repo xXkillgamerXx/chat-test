@@ -1,5 +1,6 @@
 ﻿services:
   server:
+    image: chat-test-server
     build: ./server
     container_name: chat-server
     ports:
@@ -11,6 +12,7 @@
     restart: unless-stopped
 
   client:
+    image: chat-test-client
     build: ./client
     container_name: chat-client
     ports:
