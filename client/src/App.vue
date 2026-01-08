@@ -1,19 +1,32 @@
 <template>
   <!-- Wrapper principal con fondo gradiente -->
-  <div class="min-h-screen h-screen md:h-auto bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center p-0 md:p-4">
+  <div
+    class="min-h-screen h-screen md:h-auto bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center p-0 md:p-4"
+  >
     <!-- Contenedor principal del chat -->
-    <div class="w-full h-full md:h-[90vh] md:max-w-2xl md:rounded-2xl bg-white shadow-2xl flex flex-col overflow-hidden">
-      
+    <div
+      class="w-full h-full md:h-[90vh] md:max-w-2xl md:rounded-2xl bg-white shadow-2xl flex flex-col overflow-hidden"
+    >
       <!-- Header -->
-      <header class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3 md:py-4 flex-shrink-0">
-        <h1 class="text-lg md:text-2xl font-bold text-center mb-1">💬 Chat Simple</h1>
-        <div v-if="nombreUsuario" class="text-xs md:text-sm text-center opacity-90">
+      <header
+        class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-3 md:py-4 flex-shrink-0"
+      >
+        <h1 class="text-lg md:text-2xl font-bold text-center mb-1">
+          💬 Chat Simple
+        </h1>
+        <div
+          v-if="nombreUsuario"
+          class="text-xs md:text-sm text-center opacity-90"
+        >
           Conectado como: <span class="font-semibold">{{ nombreUsuario }}</span>
         </div>
       </header>
 
       <!-- Formulario de login -->
-      <div v-if="!nombreUsuario" class="flex-1 flex items-center justify-center px-4 py-8">
+      <div
+        v-if="!nombreUsuario"
+        class="flex-1 flex items-center justify-center px-4 py-8"
+      >
         <div class="w-full max-w-md space-y-4">
           <input
             v-model="nombreInput"
@@ -32,12 +45,15 @@
       </div>
 
       <!-- Área de chat -->
-      <div v-else class="flex-1 flex flex-col overflow-hidden min-h-0">
+      <div v-else class="flex-1 flex flex-col overflow-hidden min-h-0 relative">
         <!-- Contenedor de mensajes -->
         <div
           ref="mensajesContainer"
-          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50"
-          style="-webkit-overflow-scrolling: touch; overscroll-behavior: contain;"
+          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50 pb-20 md:pb-4"
+          style="
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+          "
         >
           <!-- Mensajes -->
           <div
@@ -45,7 +61,7 @@
             :key="index"
             :class="[
               'mb-3 flex',
-              mensaje.id === socketId ? 'justify-end' : 'justify-start'
+              mensaje.id === socketId ? 'justify-end' : 'justify-start',
             ]"
           >
             <div
@@ -53,7 +69,7 @@
                 'max-w-[75%] md:max-w-[60%] rounded-2xl px-3 py-2 shadow-sm',
                 mensaje.id === socketId
                   ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-br-sm'
-                  : 'bg-white text-gray-800 rounded-bl-sm border border-gray-200'
+                  : 'bg-white text-gray-800 rounded-bl-sm border border-gray-200',
               ]"
             >
               <!-- Header del mensaje -->
@@ -61,7 +77,7 @@
                 <span
                   :class="[
                     'text-xs font-semibold',
-                    mensaje.id === socketId ? 'text-white' : 'text-purple-600'
+                    mensaje.id === socketId ? 'text-white' : 'text-purple-600',
                   ]"
                 >
                   {{ mensaje.nombre }}
@@ -69,18 +85,18 @@
                 <span
                   :class="[
                     'text-[10px] md:text-xs opacity-70 whitespace-nowrap',
-                    mensaje.id === socketId ? 'text-white' : 'text-gray-500'
+                    mensaje.id === socketId ? 'text-white' : 'text-gray-500',
                   ]"
                 >
                   {{ formatearFecha(mensaje.timestamp) }}
                 </span>
               </div>
-              
+
               <!-- Texto del mensaje -->
               <div
                 :class="[
                   'text-sm md:text-base break-words',
-                  mensaje.id === socketId ? 'text-white' : 'text-gray-800'
+                  mensaje.id === socketId ? 'text-white' : 'text-gray-800',
                 ]"
               >
                 {{ mensaje.mensaje }}
@@ -89,11 +105,10 @@
           </div>
 
           <!-- Indicador de usuario escribiendo -->
-          <div
-            v-if="usuarioEscribiendo"
-            class="mb-3 flex justify-start"
-          >
-            <div class="bg-white rounded-2xl rounded-bl-sm px-4 py-2 shadow-sm border border-gray-200">
+          <div v-if="usuarioEscribiendo" class="mb-3 flex justify-start">
+            <div
+              class="bg-white rounded-2xl rounded-bl-sm px-4 py-2 shadow-sm border border-gray-200"
+            >
               <p class="text-sm text-gray-500 italic">
                 {{ usuarioEscribiendo }} está escribiendo...
               </p>
@@ -101,21 +116,25 @@
           </div>
         </div>
 
-        <!-- Input de mensaje - SIEMPRE VISIBLE -->
-        <div class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 flex-shrink-0">
-          <div class="flex gap-2 items-end">
+        <!-- Input de mensaje - SIEMPRE VISIBLE Y FIJO EN MÓVILES -->
+        <div
+          class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 flex-shrink-0 relative z-50 w-full"
+          style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));"
+        >
+          <div class="flex gap-2 items-center">
             <input
               v-model="nuevoMensaje"
               @keyup.enter="enviarMensaje"
               @input="usuarioEstaEscribiendo"
               type="text"
               placeholder="Escribe un mensaje..."
-              class="flex-1 px-4 py-2 md:py-3 text-base border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              class="flex-1 px-4 py-3 text-base md:text-base border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all min-h-[44px]"
+              style="font-size: 16px;"
             />
             <button
               @click="enviarMensaje"
               :disabled="!nuevoMensaje.trim()"
-              class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-2 md:py-3 px-4 md:px-6 rounded-full min-w-[70px] md:min-w-[80px] hover:from-purple-700 hover:to-pink-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm md:text-base flex-shrink-0"
+              class="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-5 md:px-6 rounded-full min-w-[75px] md:min-w-[80px] hover:from-purple-700 hover:to-pink-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg text-sm md:text-base flex-shrink-0 min-h-[44px]"
             >
               Enviar
             </button>

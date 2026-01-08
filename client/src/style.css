@@ -9,11 +9,16 @@
     padding: 0;
     height: 100%;
     overflow: hidden;
+    position: fixed;
+    width: 100%;
   }
 
   #app {
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height para móviles */
+    width: 100%;
+    position: fixed;
+    overflow: hidden;
   }
 
   /* Prevenir zoom en iOS al tocar inputs */
@@ -24,6 +29,15 @@
   }
 
   @media (min-width: 768px) {
+    html,
+    body {
+      position: relative;
+    }
+    
+    #app {
+      position: relative;
+    }
+    
     input,
     textarea,
     select {
