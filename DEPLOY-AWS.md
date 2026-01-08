@@ -5,12 +5,14 @@
 ### Paso 1: Comprimir el proyecto
 
 **Desde Windows:**
+
 ```powershell
 # En la carpeta chat-app
 Compress-Archive -Path . -DestinationPath ..\chat-app.zip
 ```
 
 **O desde Git (si tienes Git instalado):**
+
 ```bash
 # Crear archivo .tar.gz
 tar -czf chat-app.tar.gz .
@@ -19,17 +21,20 @@ tar -czf chat-app.tar.gz .
 ### Paso 2: Subir a AWS EC2
 
 **Opción A: Usar SCP desde Windows PowerShell:**
+
 ```powershell
 # Subir archivo comprimido
 scp -i tu-clave.pem chat-app.zip ec2-user@tu-ip-aws:/home/ec2-user/
 ```
 
 **Opción B: Usar WinSCP (interfaz gráfica)**
+
 - Descarga WinSCP
 - Conecta a tu servidor AWS
 - Arrastra la carpeta chat-app
 
 **Opción C: Usar Git (si subiste a GitHub)**
+
 ```bash
 # En tu servidor AWS
 git clone https://github.com/tu-usuario/chat-app.git
@@ -90,18 +95,21 @@ docker-compose up --build -d
 ## Opción 2: AWS ECS (Elastic Container Service)
 
 ### Requisitos:
+
 - AWS CLI configurado
 - Cuenta de AWS con permisos ECS
 
 ### Pasos:
 
 1. **Crear repositorio en ECR (Elastic Container Registry):**
+
 ```bash
 aws ecr create-repository --repository-name chat-server --region us-east-1
 aws ecr create-repository --repository-name chat-client --region us-east-1
 ```
 
 2. **Construir y subir imágenes:**
+
 ```bash
 # Login a ECR
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin tu-cuenta.dkr.ecr.us-east-1.amazonaws.com
@@ -135,6 +143,7 @@ docker push tu-cuenta.dkr.ecr.us-east-1.amazonaws.com/chat-client:latest
 ## Recomendación
 
 **Para empezar rápido:** Usa la Opción 1 (EC2 con Docker)
+
 - Es la más simple
 - Tienes control total
 - Funciona igual que en tu PC local
@@ -204,4 +213,3 @@ docker-compose restart
 git pull  # Si usas Git
 docker-compose up --build -d
 ```
-
