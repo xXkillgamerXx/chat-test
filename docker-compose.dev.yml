@@ -1,0 +1,48 @@
+# Docker Compose para DESARROLLO
+# Monta el código como volumen para cambios en tiempo real
+# Uso: docker-compose -f docker-compose.dev.yml up -d
+
+services:
+  server:
+    image: chat-test-server
+    build: ./server
+    container_name: chat-server-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # Montar código para cambios en tiempo real
+      - ./server:/app
+      - /app/node_modules  # Excluir node_modules del volumen
+    environment:
+      - NODE_ENV=development
+    networks:
+      - chat-network
+    restart: unless-stopped
+    # El servidor se reinicia automáticamente si usas nodemon
+    # Si no tienes nodemon, necesitarás reiniciar manualmente
+
+  client:
+    image: chat-test-client
+    build: ./client
+    container_name: chat-client-dev
+    ports:
+      - "5173:5173"
+    volumes:
+      # Montar código para cambios en tiempo real
+      - ./client:/app
+      - /app/node_modules  # Excluir node_modules del volumen
+    depends_on:
+      - server
+    environment:
+      # Variables opcionales
+      # - VITE_SOCKET_URL=http://localhost:3000
+    networks:
+      - chat-network
+    restart: unless-stopped
+    # Vite tiene hot reload por defecto, los cambios se reflejan automáticamente
+    # El Dockerfile ya usa "npm run dev" que tiene hot reload
+
+networks:
+  chat-network:
+    driver: bridge
+
