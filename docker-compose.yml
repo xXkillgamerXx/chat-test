@@ -20,7 +20,8 @@
     depends_on:
       - server
     environment:
-      - VITE_SOCKET_URL=http://localhost:3000
+      # Dejar vacío para detección automática, o usar la IP de AWS
+      # VITE_SOCKET_URL=http://52.91.54.129:3000
     networks:
       - chat-network
     restart: unless-stopped

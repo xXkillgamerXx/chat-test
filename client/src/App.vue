@@ -86,6 +86,21 @@ export default {
     // Determinar la URL del servidor
     let socketUrl = import.meta.env.VITE_SOCKET_URL;
     
+    // Si VITE_SOCKET_URL está definida pero es localhost, ignorarla en producción
+    if (socketUrl && socketUrl.includes('localhost')) {
+      const isLocal = 
+        hostname === 'localhost' || 
+        hostname === '127.0.0.1' ||
+        hostname.startsWith('172.') ||
+        hostname.startsWith('10.') ||
+        hostname.startsWith('192.168.');
+      
+      // Solo usar localhost si realmente estamos en localhost
+      if (!isLocal) {
+        socketUrl = null; // Forzar detección automática
+      }
+    }
+    
     if (!socketUrl) {
       // Si estamos en localhost o IP privada, usar localhost para el servidor
       const isLocal = 
@@ -98,8 +113,15 @@ export default {
       if (isLocal) {
         socketUrl = 'http://localhost:3000';
       } else {
-        // En producción/AWS, usar el mismo hostname pero puerto 3000
-        socketUrl = `${protocol}//${hostname}:3000`;
+        // En producción/AWS, usar el mismo protocolo y hostname
+        // Si la página es HTTPS, el socket también debe ser HTTPS para móviles
+        // Si la página es HTTP, usar HTTP (pero puede fallar en móviles)
+        const useHttps = protocol === 'https:' || 
+                        window.location.port === '443' ||
+                        (!window.location.port && protocol === 'https:');
+        
+        const socketProtocol = useHttps ? 'https:' : 'http:';
+        socketUrl = `${socketProtocol}//${hostname}:3000`;
       }
     }
     
