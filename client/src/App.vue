@@ -1,11 +1,11 @@
 <template>
   <!-- Wrapper principal con fondo gradiente -->
   <div
-    class="min-h-screen h-screen md:h-auto bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center p-0 md:p-4"
+    class="min-h-screen h-screen md:h-auto bg-gradient-to-br from-purple-500 via-pink-500 to-red-500 flex items-center justify-center p-0 md:p-4 relative"
   >
     <!-- Contenedor principal del chat -->
     <div
-      class="w-full h-full md:h-[90vh] md:max-w-2xl md:rounded-2xl bg-white shadow-2xl flex flex-col overflow-hidden"
+      class="w-full h-full md:h-[90vh] md:max-w-2xl md:rounded-2xl bg-white shadow-2xl flex flex-col overflow-hidden relative"
     >
       <!-- Header -->
       <header
@@ -45,11 +45,14 @@
       </div>
 
       <!-- Área de chat -->
-      <div v-else class="flex-1 flex flex-col overflow-hidden min-h-0 relative">
+      <div
+        v-else
+        class="flex-1 flex flex-col overflow-hidden min-h-0 relative pb-20 md:pb-0"
+      >
         <!-- Contenedor de mensajes -->
         <div
           ref="mensajesContainer"
-          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50 pb-24 md:pb-4"
+          class="flex-1 overflow-y-auto px-3 md:px-4 py-4 bg-gray-50 pb-4"
           style="
             -webkit-overflow-scrolling: touch;
             overscroll-behavior: contain;
@@ -118,8 +121,11 @@
 
         <!-- Input de mensaje - SIEMPRE VISIBLE Y FIJO EN MÓVILES -->
         <div
-          class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 flex-shrink-0 w-full fixed bottom-0 left-0 right-0 md:relative md:bottom-auto md:left-auto md:right-auto z-50"
-          style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));"
+          class="bg-white border-t border-gray-200 px-3 md:px-4 py-2 md:py-3 flex-shrink-0 w-full fixed bottom-0 left-0 right-0 md:relative md:bottom-auto md:left-auto md:right-auto"
+          style="
+            z-index: 9999;
+            padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+          "
         >
           <div class="flex gap-2 items-center">
             <input
@@ -129,7 +135,7 @@
               type="text"
               placeholder="Escribe un mensaje..."
               class="flex-1 px-4 py-3 text-base md:text-base border-2 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all min-h-[44px] bg-white"
-              style="font-size: 16px;"
+              style="font-size: 16px"
             />
             <button
               @click="enviarMensaje"

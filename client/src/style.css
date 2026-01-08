@@ -11,6 +11,8 @@
     overflow: hidden;
     position: fixed;
     width: 100%;
+    /* Prevenir problemas de viewport en móviles */
+    -webkit-overflow-scrolling: touch;
   }
 
   #app {
@@ -19,6 +21,11 @@
     width: 100%;
     position: fixed;
     overflow: hidden;
+    /* Asegurar que los elementos fixed sean visibles */
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    /* Crear nuevo stacking context para z-index */
+    isolation: isolate;
   }
 
   /* Prevenir zoom en iOS al tocar inputs */
